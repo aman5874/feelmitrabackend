@@ -35,7 +35,7 @@ import logging
 from mangum import Mangum
 
 # Load environment variables
-load_dotenv("/etc/secrets/my_secret.env")  # Adjust the path based on your secret file
+load_dotenv()  # Adjust the path based on your secret file
 
 # Initialize FastAPI
 app = FastAPI(
