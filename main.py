@@ -35,30 +35,31 @@ import logging
 from mangum import Mangum
 
 # Load environment variables
-load_dotenv()
+load_dotenv("/etc/secrets/my_secret.env")  # Adjust the path based on your secret file
 
 # Initialize FastAPI
-# Define FastAPI app
 app = FastAPI(
     title="Mood Journal API",
     description="API for mood journaling and emotion analysis",
     version="1.0.0"
 )
 
-# Redirect HTTP to HTTPS in production
+# Redirect HTTP to HTTPS in production (if running on Render)
 if os.environ.get("RENDER"):
     app.add_middleware(HTTPSRedirectMiddleware)
 
 # CORS Configuration
-frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[frontend_url],  # Allow frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+frontend_url = os.environ.get("FRONTEND_URL")
+if frontend_url:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[frontend_url],  # Allow frontend URL
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    print("Warning: FRONTEND_URL is not set. CORS might not be configured correctly.")
 
 # Initialize Gemini AI
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -1529,9 +1530,8 @@ else 'frequent emotional changes'}."""
 # Add handler for serverless
 handler = Mangum(app)
 
-# Update the main block for local development only
 if __name__ == "__main__":
     import uvicorn
-    # Only run uvicorn in local development
-    if not os.environ.get("VERCEL_ENV"):
+    # Only run uvicorn for local development
+    if not os.environ.get("RENDER"):
         uvicorn.run(app, host="0.0.0.0", port=8000)
