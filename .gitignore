@@ -1,2 +1,7 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
 .env
-/__pycache__
