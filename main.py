@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from pydantic import BaseModel, field_validator, ConfigDict, Field
 from datetime import datetime
 import uuid
@@ -37,17 +38,23 @@ from mangum import Mangum
 load_dotenv()
 
 # Initialize FastAPI
+# Define FastAPI app
 app = FastAPI(
     title="Mood Journal API",
-    description="API for mood journaling and analysis",
-    version="1.0.0",
-    root_path="/api" if os.environ.get("VERCEL_ENV") else ""
+    description="API for mood journaling and emotion analysis",
+    version="1.0.0"
 )
 
-# CORS configuration
+# Redirect HTTP to HTTPS in production
+if os.environ.get("RENDER"):
+    app.add_middleware(HTTPSRedirectMiddleware)
+
+# CORS Configuration
+frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[frontend_url],  # Allow frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
