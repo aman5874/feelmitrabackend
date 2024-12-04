@@ -1532,6 +1532,5 @@ handler = Mangum(app)
 
 if __name__ == "__main__":
     import uvicorn
-    # Only run uvicorn for local development
-    if not os.environ.get("RENDER"):
-        uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))  # Fallback to 8000 if $PORT is not set
+    uvicorn.run(app, host="0.0.0.0", port=port)
